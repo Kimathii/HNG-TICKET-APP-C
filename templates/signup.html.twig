@@ -1,0 +1,101 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Sign Up - TicketFlow{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="auth-container">
+        <div class="circle circle-green"></div>
+        <div class="circle circle-yellow"></div>
+        
+        <div class="auth-card">
+            <h2 class="auth-title">Create Account</h2>
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input
+                        type="email"
+                        id="signupEmail"
+                        class="form-input"
+                        placeholder="you@example.com"
+                    />
+                    <p class="error-text" id="emailError"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input
+                        type="password"
+                        id="signupPassword"
+                        class="form-input"
+                        placeholder="••••••"
+                    />
+                    <p class="error-text" id="passwordError"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        class="form-input"
+                        placeholder="••••••"
+                    />
+                    <p class="error-text" id="confirmPasswordError"></p>
+                </div>
+                <button type="submit" class="btn-submit">Sign Up</button>
+            </form>
+            <p class="auth-link-text">
+                Already have an account? 
+                <a href="#" onclick="navigateTo('login'); return false;" class="auth-link">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function handleSignup(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Clear previous errors
+    document.getElementById('emailError').textContent = '';
+    document.getElementById('passwordError').textContent = '';
+    document.getElementById('confirmPasswordError').textContent = '';
+    
+    // Validate
+    let hasError = false;
+    
+    if (!email) {
+        document.getElementById('emailError').textContent = 'Email is required';
+        hasError = true;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+        document.getElementById('emailError').textContent = 'Invalid email format';
+        hasError = true;
+    }
+    
+    if (!password) {
+        document.getElementById('passwordError').textContent = 'Password is required';
+        hasError = true;
+    } else if (password.length < 6) {
+        document.getElementById('passwordError').textContent = 'Password must be at least 6 characters';
+        hasError = true;
+    }
+    
+    if (password !== confirmPassword) {
+        document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+        hasError = true;
+    }
+    
+    if (hasError) return;
+    
+    // Attempt signup
+    if (Auth.signup(email, password, confirmPassword)) {
+        navigateTo('dashboard');
+    }
+}
+</script>
+{% endblock %}

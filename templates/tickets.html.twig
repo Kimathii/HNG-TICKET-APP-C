@@ -1,0 +1,241 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Tickets - TicketFlow{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="tickets-container">
+        <div class="container">
+            <div class="header">
+                <h1 class="page-title">Ticket Management</h1>
+                <button onclick="toggleForm()" class="btn-create" id="toggleFormBtn">
+                    Create Ticket
+                </button>
+            </div>
+
+            <!-- Form -->
+            <div id="ticketForm" class="form-card" style="display: none;">
+                <h2 class="form-title" id="formTitle">Create New Ticket</h2>
+                <form id="ticketFormElement" onsubmit="handleTicketSubmit(event)">
+                    <input type="hidden" id="ticketId" value="">
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Title <span class="required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="ticketTitle"
+                            class="form-input"
+                            placeholder="Enter ticket title"
+                        />
+                        <p class="error-text" id="titleError"></p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Status <span class="required">*</span>
+                            </label>
+                            <select id="ticketStatus" class="form-select">
+                                <option value="open">Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                            <p class="error-text" id="statusError"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select id="ticketPriority" class="form-select">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea
+                            id="ticketDescription"
+                            class="form-textarea"
+                            rows="4"
+                            placeholder="Enter ticket description (max 500 characters)"
+                            maxlength="500"
+                            oninput="updateCharCount()"
+                        ></textarea>
+                        <p class="char-count" id="charCount">0/500 characters</p>
+                        <p class="error-text" id="descriptionError"></p>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        Create Ticket
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tickets List -->
+            <div class="tickets-grid" id="ticketsList">
+                <!-- Tickets will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="/assets/js/tickets.js"></script>
+<script>
+let isFormVisible = false;
+let editingTicketId = null;
+
+function toggleForm() {
+    isFormVisible = !isFormVisible;
+    const form = document.getElementById('ticketForm');
+    const btn = document.getElementById('toggleFormBtn');
+    
+    if (isFormVisible) {
+        form.style.display = 'block';
+        btn.textContent = 'Cancel';
+    } else {
+        form.style.display = 'none';
+        btn.textContent = 'Create Ticket';
+        resetForm();
+    }
+}
+
+function resetForm() {
+    document.getElementById('ticketFormElement').reset();
+    document.getElementById('ticketId').value = '';
+    document.getElementById('formTitle').textContent = 'Create New Ticket';
+    document.getElementById('submitBtn').textContent = 'Create Ticket';
+    document.getElementById('charCount').textContent = '0/500 characters';
+    editingTicketId = null;
+    
+    // Clear errors
+    document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+}
+
+function updateCharCount() {
+    const desc = document.getElementById('ticketDescription').value;
+    document.getElementById('charCount').textContent = `${desc.length}/500 characters`;
+}
+
+function handleTicketSubmit(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('ticketTitle').value;
+    const status = document.getElementById('ticketStatus').value;
+    const description = document.getElementById('ticketDescription').value;
+    const priority = document.getElementById('ticketPriority').value;
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+    
+    // Validate
+    let hasError = false;
+    
+    if (!title.trim()) {
+        document.getElementById('titleError').textContent = 'Title is required';
+        hasError = true;
+    }
+    
+    if (!['open', 'in_progress', 'closed'].includes(status)) {
+        document.getElementById('statusError').textContent = 'Invalid status';
+        hasError = true;
+    }
+    
+    if (description.length > 500) {
+        document.getElementById('descriptionError').textContent = 'Description must be less than 500 characters';
+        hasError = true;
+    }
+    
+    if (hasError) return;
+    
+    const ticketData = { title, status, description, priority };
+    
+    if (editingTicketId) {
+        TicketManager.updateTicket(editingTicketId, ticketData);
+    } else {
+        TicketManager.addTicket(ticketData);
+    }
+    
+    toggleForm();
+    renderTickets();
+}
+
+function editTicket(id) {
+    const ticket = TicketManager.getTicketById(id);
+    if (!ticket) return;
+    
+    editingTicketId = id;
+    document.getElementById('ticketId').value = id;
+    document.getElementById('ticketTitle').value = ticket.title;
+    document.getElementById('ticketStatus').value = ticket.status;
+    document.getElementById('ticketDescription').value = ticket.description || '';
+    document.getElementById('ticketPriority').value = ticket.priority || 'medium';
+    document.getElementById('formTitle').textContent = 'Edit Ticket';
+    document.getElementById('submitBtn').textContent = 'Update Ticket';
+    
+    updateCharCount();
+    
+    if (!isFormVisible) {
+        toggleForm();
+    }
+}
+
+function deleteTicket(id) {
+    if (confirm('Are you sure you want to delete this ticket?')) {
+        TicketManager.deleteTicket(id);
+        renderTickets();
+    }
+}
+
+function renderTickets() {
+    const tickets = TicketManager.getAllTickets();
+    const container = document.getElementById('ticketsList');
+    
+    if (tickets.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <p class="empty-text">No tickets yet. Create your first ticket!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = tickets.map(ticket => `
+        <div class="ticket-card">
+            <div class="ticket-header">
+                <h3 class="ticket-title">${escapeHtml(ticket.title)}</h3>
+                <span class="status-badge status-${ticket.status}">
+                    ${ticket.status.replace('_', ' ')}
+                </span>
+            </div>
+            ${ticket.description ? `
+                <p class="ticket-description">${escapeHtml(ticket.description)}</p>
+            ` : ''}
+            <div class="ticket-meta">
+                <span class="priority-text">
+                    Priority: <strong style="text-transform: capitalize;">${ticket.priority || 'medium'}</strong>
+                </span>
+            </div>
+            <div class="ticket-actions">
+                <button onclick="editTicket('${ticket.id}')" class="btn-edit">Edit</button>
+                <button onclick="deleteTicket('${ticket.id}')" class="btn-delete">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Initial render
+document.addEventListener('DOMContentLoaded', renderTickets);
+</script>
+{% endblock %}

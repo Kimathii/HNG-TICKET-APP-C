@@ -1,0 +1,54 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Dashboard - TicketFlow{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="dashboard-container">
+        <div class="container">
+            <h1 class="page-title">Dashboard</h1>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 class="stat-label">Total Tickets</h3>
+                    <p class="stat-value stat-blue" id="totalTickets">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="stat-label">Open Tickets</h3>
+                    <p class="stat-value stat-green" id="openTickets">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="stat-label">In Progress</h3>
+                    <p class="stat-value stat-amber" id="inProgressTickets">0</p>
+                </div>
+            </div>
+
+            <div class="action-grid">
+                <div class="stat-card">
+                    <h3 class="stat-label">Resolved Tickets</h3>
+                    <p class="stat-value stat-gray" id="closedTickets">0</p>
+                </div>
+                <div class="action-card">
+                    <h3 class="action-label">Quick Actions</h3>
+                    <a href="#" onclick="navigateTo('tickets'); return false;" class="btn-action">
+                        Manage Tickets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Load ticket statistics
+document.addEventListener('DOMContentLoaded', function() {
+    const stats = TicketManager.getStats();
+    document.getElementById('totalTickets').textContent = stats.total;
+    document.getElementById('openTickets').textContent = stats.open;
+    document.getElementById('inProgressTickets').textContent = stats.inProgress;
+    document.getElementById('closedTickets').textContent = stats.closed;
+});
+</script>
+{% endblock %}

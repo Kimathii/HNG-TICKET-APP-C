@@ -1,0 +1,68 @@
+{% extends "base.html.twig" %}
+
+{% block title %}TicketFlow - Home{% endblock %}
+
+{% block content %}
+<div class="page">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="circle circle-large"></div>
+        <div class="circle circle-small"></div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">Streamline Your Workflow</h1>
+            <p class="hero-subtitle">
+                The modern ticket management system designed for teams who value simplicity and efficiency
+            </p>
+            <div class="hero-buttons">
+                <button onclick="navigateTo('login')" class="btn-hero-white">
+                    Login
+                </button>
+                <button onclick="navigateTo('signup')" class="btn-hero-yellow">
+                    Get Started
+                </button>
+            </div>
+        </div>
+        
+        <!-- Wavy Bottom -->
+        <div class="wave-container">
+            <svg viewBox="0 0 1440 120" class="wave-svg">
+                <path
+                    fill="#ffffff"
+                    d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+                />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="features-title">Why Choose TicketFlow?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-heading">Easy to Use</h3>
+                    <p class="feature-text">
+                        Intuitive interface that gets your team up and running in minutes
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-heading">Lightning Fast</h3>
+                    <p class="feature-text">
+                        Real-time updates and instant notifications keep everyone in sync
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-heading">Secure & Reliable</h3>
+                    <p class="feature-text">
+                        Your data is protected with industry-standard security measures
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

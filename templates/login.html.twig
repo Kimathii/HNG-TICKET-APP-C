@@ -1,0 +1,89 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Login - TicketFlow{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="auth-container">
+        <div class="circle circle-blue"></div>
+        <div class="circle circle-purple"></div>
+        
+        <div class="auth-card">
+            <h2 class="auth-title">Welcome Back</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        class="form-input"
+                        placeholder="demo@user.com"
+                    />
+                    <p class="error-text" id="emailError"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        class="form-input"
+                        placeholder="••••••"
+                    />
+                    <p class="error-text" id="passwordError"></p>
+                </div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
+            <p class="auth-link-text">
+                Don't have an account? 
+                <a href="#" onclick="navigateTo('signup'); return false;" class="auth-link">Sign up</a>
+            </p>
+            <div class="demo-credentials">
+                <p class="demo-title">Demo Credentials:</p>
+                <p class="demo-text">Email: demo@user.com</p>
+                <p class="demo-text">Password: 123456</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    // Clear previous errors
+    document.getElementById('emailError').textContent = '';
+    document.getElementById('passwordError').textContent = '';
+    
+    // Validate
+    let hasError = false;
+    
+    if (!email) {
+        document.getElementById('emailError').textContent = 'Email is required';
+        hasError = true;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+        document.getElementById('emailError').textContent = 'Invalid email format';
+        hasError = true;
+    }
+    
+    if (!password) {
+        document.getElementById('passwordError').textContent = 'Password is required';
+        hasError = true;
+    } else if (password.length < 6) {
+        document.getElementById('passwordError').textContent = 'Password must be at least 6 characters';
+        hasError = true;
+    }
+    
+    if (hasError) return;
+    
+    // Attempt login
+    if (Auth.login(email, password)) {
+        navigateTo('dashboard');
+    }
+}
+</script>
+{% endblock %}
