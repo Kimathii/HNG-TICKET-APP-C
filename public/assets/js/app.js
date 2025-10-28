@@ -1,8 +1,7 @@
 // Global Navigation and Initialization
 function navigateTo(page) {
-  // In a real Twig setup with Symfony, you'd use proper routing
-  // For static setup, we simulate navigation
-  window.location.href = `/${page}.html`;
+  // Navigate to Twig routes (no .html extension needed)
+  window.location.href = `/${page}`;
 }
 
 function navigateHome() {
@@ -13,8 +12,9 @@ function navigateHome() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   // Update navbar based on auth state
-  Auth.updateNavbar();
-  
-  // Check authentication for protected pages
-  Auth.checkAuth();
+  if (typeof Auth !== 'undefined') {
+    Auth.updateNavbar();
+    // Check authentication for protected pages
+    Auth.checkAuth();
+  }
 });
