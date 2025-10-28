@@ -26,5 +26,5 @@ COPY . .
 # Expose port
 EXPOSE 10000
 
-# Start PHP server with router script
-CMD php -S 0.0.0.0:${PORT:-10000} -t public router.php
+# Start PHP server from root with public/index.php as entry
+CMD php -S 0.0.0.0:${PORT:-10000} public/index.php
